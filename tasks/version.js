@@ -13,8 +13,8 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('version', 'Update version number in all the files.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-      prefix: '[^\\-]version[\'"]?\\s*[:=]\\s*[\'"]',
-      replace: '[0-9a-zA-Z\\-_\\.]+',
+      //prefix: '[^\\-]version[\'"]?\\s*[:=]\\s*[\'"]',
+      //replace: '[0-9a-zA-Z\\-_\\.]+',
       pkg: grunt.config('pkg'),
       release: ''
     });
@@ -46,12 +46,13 @@ module.exports = function(grunt) {
         grunt.log.error('Source file "' + filepath + '" not found.');
         return '';
       }
+      grunt.log.writeln('New version is :' + version);
       // Read file source.
-      var pattern = new RegExp('(' + options.prefix + ')(' + options.replace + ')', 'g'),
-          file = grunt.file.read(filepath),
-          newfile = file.replace(pattern, '$1' + version),
-          matches = pattern.exec(file);
-
+      var pattern = new RegExp(options.prefix),          
+          file = grunt.file.read(filepath),          
+          newfile = file.replace(pattern, version),
+          matches = pattern.exec(file); 
+         
       if (!matches) {
         grunt.log.subhead('Pattern not found in file');
         grunt.log.writeln('Path: ' + filepath);

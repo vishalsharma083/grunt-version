@@ -11,21 +11,13 @@
 module.exports = function(grunt) {
 
   // Test targets to be merged into grunt.config.version
-  var version_tests = {
-    prefix_option: {
-      options: {
-        prefix: 'version[\'"]?( *=|:) *[\'"]',
-      },
-      src: ['tmp/testing.js', 'tmp/testingb.js'],
-    },
-    release_option: {
-      options: {
-        release: 'patch'
-      },
+  var version_tests = {    
+    release_option: {      
       src: [
         'tmp/123.js',
         'tmp/456.js',
-        'tmp/test-package.json'
+        'tmp/test-package.json',
+        'tmp/index.html'
       ]
     },
     minor: {
@@ -34,16 +26,7 @@ module.exports = function(grunt) {
         pkg: 'test/fixtures/test-pkg-vc.json'
       },
       src: ['tmp/test-pkg-vc.json', 'tmp/testingc.js']
-    },
-    literal: {
-      options: {
-        release: '3.2.1',
-        pkg: grunt.file.readJSON('test/fixtures/test-package-v.json')
-      },
-      src: [
-        'tmp/test-package-v.json'
-      ]
-    },
+    }
   };
 
   // Project configuration.
@@ -67,7 +50,7 @@ module.exports = function(grunt) {
     copy: {
       tests: {
         files: [{
-          src: ['test/fixtures/*'],
+          src: ['test/fixtures/*','test/fixtures/*.html'],
           dest: 'tmp/',
           filter: 'isFile',
           expand: true,
@@ -76,20 +59,25 @@ module.exports = function(grunt) {
       }
     },
 
-    version: {
+    version: {     
+      literal: {
       options: {
-        pkg: grunt.file.readJSON('test/fixtures/test-package.json')
+        release: 'version=3.2.4',
+        prefix: 'version[=]([0-9a-zA-Z\-_\.]+)',
       },
-      // Not for testing
-      patch: {
-        options: {
-          release: 'patch',
-          pkg: grunt.file.readJSON('package.json')
-        },
-        src: [
-          'package.json'
-        ]
+      src: [
+         'tmp/index.html'
+      ]
+    },
+    portal: {
+      options: {
+        release: '1.0.92',
+        prefix: '#PORTALID#',
       },
+      src: [
+         'tmp/index.html'
+      ]
+    }
     },
 
     // Unit tests.
@@ -115,6 +103,15 @@ module.exports = function(grunt) {
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
   grunt.registerTask('test', [
+    'clean',
+    'copy',
+    'version:portal',
+    'version:literal' 
+  ]);
+
+   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
+  // plugin's task(s), then test the result.
+  grunt.registerTask('test2', [
     'clean',
     'copy',
     'version:prefix_option',
